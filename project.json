@@ -26,6 +26,11 @@
     },
     "test": {
       "command": "vitest"
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
     }
   }
 }
