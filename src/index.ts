@@ -1,4 +1,8 @@
-export { AutopairsPlugin, AutopairsPluginKey } from './lib/autopairs';
+export {
+  autopairs,
+  AutopairsPlugin,
+  AutopairsPluginKey,
+} from './lib/autopairs';
 export {
   AutopairGroup as BracketCharGroup,
   Bracket as Brackets,
