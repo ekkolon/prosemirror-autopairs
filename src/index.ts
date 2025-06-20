@@ -4,29 +4,13 @@ export {
   AutopairsPluginKey,
 } from './lib/autopairs';
 export {
-  AutopairGroup as BracketCharGroup,
-  Bracket as Brackets,
-  Char,
-  AutopairGroup as CharGroup,
+  AutopairGroup,
   ClosingBracket,
-  ClosingChar,
-  findClosingMatch,
-  findOpeningMatch,
-  resolveCharGroup as getCharsForGroup,
-  isCharGroup,
-  isClosingChar,
-  isAutopairChar as isMatchingChar,
-  isMatchingPair as isMatchingPair,
-  isOpeningChar,
-  isQuoteChar as isQuote,
   OpeningBracket,
-  OpeningChar,
   Quote,
+  type Bracket,
+  type Char,
+  type ClosingChar,
+  type OpeningChar,
 } from './lib/chars';
-export { AutopairsOptions } from './lib/config';
-export {
-  AutopairKeyBindings as AutopairKeymap,
-  AutopairKeyBindingCommandFactory as AutopairKeymapCommandFactory,
-  AutopairKeyBindingsConfig as AutopairKeymapConfig,
-  KeyboardKey,
-} from './lib/keymap';
+export type { AutopairsOptions } from './lib/config';
