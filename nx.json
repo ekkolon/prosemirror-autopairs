@@ -12,6 +12,7 @@
     ],
     "sharedGlobals": []
   },
+  "neverConnectToCloud": true,
   "nxCloudId": "6854a926b378f07687fd039d",
   "targetDefaults": {
     "@nx/js:tsc": {
