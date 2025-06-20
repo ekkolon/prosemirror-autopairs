@@ -1,1 +1,20 @@
-export {};
+export {
+  AutopairGroup as BracketCharGroup,
+  Bracket as Brackets,
+  Char,
+  AutopairGroup as CharGroup,
+  ClosingBracket,
+  ClosingChar,
+  findClosingMatch,
+  findOpeningMatch,
+  resolveCharGroup as getCharsForGroup,
+  isCharGroup,
+  isClosingChar,
+  isAutopairChar as isMatchingChar,
+  isMatchingPair as isMatchingPair,
+  isOpeningChar,
+  isQuoteChar as isQuote,
+  OpeningBracket,
+  OpeningChar,
+  Quote,
+} from './lib/chars';
