@@ -18,3 +18,4 @@ export {
   OpeningChar,
   Quote,
 } from './lib/chars';
+export { AutopairsOptions } from './lib/config';
