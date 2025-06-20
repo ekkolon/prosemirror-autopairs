@@ -4,7 +4,7 @@ Smart auto-pairing of brackets and quotes for ProseMirror editors.
 
 **Supported auto-pairs**:
 
-`< >`   `{ }`   `( )`   `[]`   `"`   `'`
+`< >` `{ }` `( )` `[]` `"` `'`
 
 ## Features
 
@@ -15,7 +15,7 @@ Smart auto-pairing of brackets and quotes for ProseMirror editors.
 
 ## Usage
 
-This plugin accepts an optional `AutopairsOptions` object to enable or disable specific groups of *auto-closable* characters.
+This plugin accepts an optional `AutopairsOptions` object to enable or disable specific groups of _auto-closable_ characters.
 
 If no options are passed, **all groups are enabled by default**.
 
@@ -24,12 +24,12 @@ import { autopairs } from 'prosemirror-autopairs';
 
 const plugins = [
   autopairs({
-    angleBrackets: true,      // < >
-    curlyBrackets: true,      // { }
-    roundBrackets: true,      // ( )
-    squareBrackets: true,     // [ ]
-    doubleQuotes: true,       // "
-    singleQuotes: true,       // '
+    angleBrackets: true, // < >
+    curlyBrackets: true, // { }
+    roundBrackets: true, // ( )
+    squareBrackets: true, // [ ]
+    doubleQuotes: true, // "
+    singleQuotes: true, // '
   }),
 ];
 ```

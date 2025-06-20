@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "ProseMirror plugin for smart auto-pairing of brackets and quotes",
   "type": "module",
-  "main": "./src/index.js",
+  "main": "./index.js",
   "types": "./src/index.d.ts",
   "license": "MIT",
   "author": {
@@ -32,12 +32,13 @@
     "includedScripts": []
   },
   "dependencies": {
-    "tslib": "^2.8.1",
     "prosemirror-keymap": "^1.2.3",
-    "prosemirror-state": "^1.4.3"
+    "prosemirror-state": "^1.4.3",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@nx/esbuild": "^21.2.1",
     "@nx/eslint": "21.2.1",
     "@nx/eslint-plugin": "21.2.1",
     "@nx/jest": "^21.2.1",
