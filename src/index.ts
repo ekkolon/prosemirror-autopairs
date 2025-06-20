@@ -19,3 +19,9 @@ export {
   Quote,
 } from './lib/chars';
 export { AutopairsOptions } from './lib/config';
+export {
+  AutopairKeyBindings as AutopairKeymap,
+  AutopairKeyBindingCommandFactory as AutopairKeymapCommandFactory,
+  AutopairKeyBindingsConfig as AutopairKeymapConfig,
+  KeyboardKey,
+} from './lib/keymap';
