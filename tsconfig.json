@@ -12,6 +12,7 @@
     "lib": ["es2022", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "strict": true,
     "baseUrl": ".",
     "paths": {
       "prosemirror-autopairs": ["src/index.ts"]
