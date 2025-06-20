@@ -47,10 +47,7 @@ export function buildAutopairKeyBindings(
 ): PartialAutopairKeyBindings {
   const charHandlerReducer = (
     record: PartialAutopairKeyBindings,
-    [keyOrChar, factory]: [
-      Char | KeyboardKey,
-      AutopairKeyBindingCommandFactory,
-    ],
+    [keyOrChar, factory]: [string, AutopairKeyBindingCommandFactory],
   ) => ({
     ...record,
     [keyOrChar]: factory(keyOrChar),
