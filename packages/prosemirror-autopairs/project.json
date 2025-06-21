@@ -24,10 +24,7 @@
         "outputPath": "dist/packages/prosemirror-autopairs",
         "main": "packages/prosemirror-autopairs/src/index.ts",
         "tsConfig": "packages/prosemirror-autopairs/tsconfig.lib.json",
-        "assets": [
-          "./README.md",
-          "./LICENSE"
-        ],
+        "assets": ["./README.md", "./LICENSE"],
         "deleteOutputPath": false,
         "format": ["cjs", "esm"],
         "declaration": false,

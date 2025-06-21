@@ -10,7 +10,7 @@ const projectRoot = path.join('packages', projectName);
 const input = path.join(cwd, projectRoot, '/src/index.ts');
 const tsconfig = path.join(cwd, projectRoot, 'tsconfig.types.json');
 
-const buildDir = path.join(cwd, 'dist', projectName);
+const buildDir = path.join(cwd, 'dist', projectRoot);
 const indexDts = path.join(buildDir, 'index.d.ts');
 
 export default defineConfig({
