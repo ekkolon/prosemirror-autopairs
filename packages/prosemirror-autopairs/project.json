@@ -21,7 +21,7 @@
       "outputs": ["{options.outputPath}"],
       "dependsOn": ["prosemirror-autopairs:build-dts"],
       "options": {
-        "outputPath": "dist/prosemirror-autopairs",
+        "outputPath": "dist/packages/prosemirror-autopairs",
         "main": "packages/prosemirror-autopairs/src/index.ts",
         "tsConfig": "packages/prosemirror-autopairs/tsconfig.lib.json",
         "assets": [
