@@ -5,21 +5,30 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": true,
+        "commands": [
+          { "command": "pnpm exec nx esbuild {projectName}" },
+          { "command": "pnpm exec nx build-dts {projectName}" }
+        ]
+      }
+    },
     "build-dts": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          {
-            "command": "pnpm rollup -c packages/prosemirror-autopairs/rollup.dts.config.mjs"
-          }
+        "args": [
+          "--project={projectName}",
+          "--tsconfig={projectRoot}/tsconfig.dts.json",
+          "--nxTarget=esbuild"
         ],
-        "parallel": false
+        "commands": [{ "command": "pnpm exec tsx scripts/build-dts.ts" }]
       }
     },
-    "build": {
+    "esbuild": {
       "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
-      "dependsOn": ["prosemirror-autopairs:build-dts"],
       "options": {
         "outputPath": "dist/packages/prosemirror-autopairs",
         "main": "packages/prosemirror-autopairs/src/index.ts",
