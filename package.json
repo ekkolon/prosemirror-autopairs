@@ -1,71 +1,52 @@
 {
-  "name": "prosemirror-autopairs",
-  "version": "0.1.0",
-  "description": "ProseMirror plugin for smart auto-pairing of brackets and quotes",
-  "type": "module",
-  "main": "./index.js",
-  "types": "./src/index.d.ts",
+  "name": "@prosemirror-autopairs/source",
+  "version": "0.0.0",
   "license": "MIT",
-  "author": {
-    "name": "Nelson Dominguez",
-    "email": "ekkolon@proton.me"
-  },
-  "maintainers": [
-    {
-      "name": "Nelson Dominguez",
-      "email": "ekkolon@proton.me"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ekkolon/prosemirror-autopairs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ekkolon/prosemirror-autopairs/issues"
-  },
   "scripts": {
     "lint": "pnpm exec nx lint",
+    "test": "pnpm exec nx test",
     "build": "pnpm exec nx build",
-    "test": "pnpm exec nx test"
+    "affected": "pnpm exec nx affected -t lint test build",
+    "format": "pnpm exec nx format --all"
   },
-  "nx": {
-    "includedScripts": []
-  },
-  "dependencies": {
-    "prosemirror-keymap": "^1.2.3",
-    "prosemirror-state": "^1.4.3",
-    "tslib": "^2.8.1"
-  },
+  "private": true,
   "devDependencies": {
     "@eslint/js": "^9.29.0",
-    "@nx/esbuild": "^21.2.1",
+    "@nx/esbuild": "21.2.1",
     "@nx/eslint": "21.2.1",
     "@nx/eslint-plugin": "21.2.1",
-    "@nx/jest": "^21.2.1",
     "@nx/js": "21.2.1",
     "@nx/vite": "21.2.1",
     "@nx/web": "21.2.1",
-    "@nx/workspace": "21.2.1",
     "@swc-node/register": "~1.10.10",
-    "@swc/core": "~1.12.3",
+    "@swc/core": "~1.12.4",
     "@swc/helpers": "~0.5.17",
     "@types/node": "24.0.3",
+    "@typescript-eslint/utils": "^8.34.1",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
+    "esbuild": "^0.25.5",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
-    "jiti": "2.4.2",
-    "jsdom": "^26.1.0",
+    "eslint-plugin-playwright": "^2.2.0",
+    "jsdom": "~26.1.0",
     "jsonc-eslint-parser": "^2.4.0",
     "nx": "21.2.1",
     "prettier": "^3.5.3",
     "prosemirror-model": "^1.25.1",
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-view": "^1.40.0",
-    "tslib": "^2.3.0",
+    "rollup": "^4.44.0",
+    "rollup-plugin-dts": "^6.2.1",
+    "ts-node": "10.9.2",
+    "tslib": "^2.8.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^6.3.5",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-state": "^1.4.3"
   }
 }

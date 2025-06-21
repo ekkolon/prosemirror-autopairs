@@ -1,0 +1,45 @@
+{
+  "name": "prosemirror-autopairs",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/prosemirror-autopairs/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build-dts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "pnpm rollup -c packages/prosemirror-autopairs/rollup.dts.config.mjs"
+          }
+        ],
+        "parallel": false
+      }
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "dependsOn": ["prosemirror-autopairs:build-dts"],
+      "options": {
+        "outputPath": "dist/prosemirror-autopairs",
+        "main": "packages/prosemirror-autopairs/src/index.ts",
+        "tsConfig": "packages/prosemirror-autopairs/tsconfig.lib.json",
+        "assets": [
+          "./README.md",
+          "./LICENSE"
+        ],
+        "deleteOutputPath": false,
+        "format": ["cjs", "esm"],
+        "declaration": false,
+        "target": "es2022",
+        "platform": "browser"
+      }
+    },
+
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  }
+}
