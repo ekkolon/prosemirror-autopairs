@@ -2,39 +2,46 @@ import { keymap } from 'prosemirror-keymap';
 import { Command, Plugin, PluginKey, Selection } from 'prosemirror-state';
 
 import {
-  findClosingMatch,
-  isAutopairChar,
-  isClosingChar,
+  AUTOPAIR_GROUPS,
+  AutopairGroup,
+  BACKSPACE,
+  Character,
+  getClosingCharacter,
+  isClosingCharacter,
+  isMatchingCharacter,
   isMatchingPair,
-  isOpeningChar,
-} from './chars';
-import { AutopairsOptions, resolveCharsToHandle } from './config';
-import {
-  AutopairKeyBindingsConfig,
-  KeyboardKey,
-  buildAutopairKeyBindings,
-} from './keymap';
+  isOpeningCharacter,
+} from './pairs';
 import { isTextNode, shouldAutoClose, shouldSkipClosing } from './utils';
 
 /**
- * Creates a new instance of the {@link AutopairsPlugin} with the given options.
+ * Configuration object specifying which character groups should be auto-paired.
+ * Each key corresponds to a character group, and the value determines whether
+ * auto-pairing is enabled for that group.
  *
- * This is the recommended way to add auto-pairing behavior to your ProseMirror editor.
- *
- * @param options Configuration object to enable or disable specific autopair groups.
- * @returns A configured AutopairsPlugin instance.
+ * Only specified groups are considered; others fall back to defaults.
  */
-export function autopairs(options: AutopairsOptions = {}): AutopairsPlugin {
-  return new AutopairsPlugin(options);
-}
+export type AutopairsOptions = Partial<Record<AutopairGroup, boolean>>;
 
 /**
- * Unique key identifying the AutopairsPlugin instance.
+ * Default configuration enabling all auto-pair groups.
+ */
+const defaultConfig = {
+  angleBrackets: true,
+  curlyBrackets: true,
+  roundBrackets: true,
+  squareBrackets: true,
+  doubleQuotes: true,
+  singleQuotes: true,
+} satisfies AutopairsOptions;
+
+/**
+ * Unique key identifying an `autopairs` Plugin instance.
  */
 export const AutopairsPluginKey = new PluginKey('autopairs');
 
 /**
- * ProseMirror plugin that implements intelligent auto-pairing of matching
+ * Creates a new ProseMirror plugin that implements intelligent auto-pairing of matching
  * characters (e.g., brackets, quotes) and smart backspace behavior.
  *
  * Features include:
@@ -42,32 +49,55 @@ export const AutopairsPluginKey = new PluginKey('autopairs');
  * - Wrapping selected text with matching pairs.
  * - Skipping over existing closing characters when typed.
  * - Deleting matching pairs on backspace when the cursor is between them.
+ *
+ * @param options Configuration object to enable or disable specific autopair groups.
+ * @returns A new ProseMirror {@link Plugin} instance.
  */
-export class AutopairsPlugin extends Plugin {
-  /**
-   * Creates an AutopairsPlugin instance.
-   *
-   * Sets up key bindings to handle auto-pair insertion and deletion.
-   *
-   * @param options Configuration for enabling/disabling specific autopair groups.
-   */
-  constructor(options: AutopairsOptions = {}) {
-    const autopairCharBindings = resolveCharsToHandle(options).reduce(
-      (mapping, char) => ({ ...mapping, [char]: createAutopairCommandForChar }),
-      {} as Partial<AutopairKeyBindingsConfig>,
-    );
+export function autopairs(options: AutopairsOptions = {}): Plugin {
+  const keyBindings = buildKeyBindings(options);
+  const autopairsKeymap = keymap(keyBindings);
+  return new Plugin({ ...autopairsKeymap, key: AutopairsPluginKey });
+}
 
-    const keyboardKeyBindings = {
-      [KeyboardKey.Backspace]: createBackspaceInputCommand,
-    } satisfies Partial<AutopairKeyBindingsConfig>;
+/**
+ * Complete set of keymap bindings for auto-pairing behavior.
+ * Maps characters and special keys to ProseMirror commands.
+ */
+type KeyBindings = Record<Character, Command> & { Backspace: Command };
 
-    const autopairKeyBindings = buildAutopairKeyBindings({
-      ...autopairCharBindings,
-      ...keyboardKeyBindings,
-    });
+/**
+ * Generates a ProseMirror-compatible keymap object for handling
+ * auto-pairing behaviors related to opening and closing characters, as well as backspace.
+ *
+ * It maps each auto-closable opening/closing character to `createBracketInputCommand`
+ * and the 'Backspace' key to `createBackspaceInputCommand`.
+ *
+ * @returns {Partial<KeyBindings>} A partial keymap object ready to be passed to `keymap()` plugin.
+ */
+function buildKeyBindings(options: AutopairsOptions): Partial<KeyBindings> {
+  const chars = getEnabledAutopairChars(options);
+  const mergeAutopairCharHandler = (bindings: Partial<KeyBindings>, char: string) => {
+    return { ...bindings, [char]: createAutopairInputHandler(char) };
+  };
 
-    super({ ...keymap(autopairKeyBindings), key: AutopairsPluginKey });
-  }
+  return {
+    ...chars.reduce(mergeAutopairCharHandler, {}),
+    [BACKSPACE]: createBackspaceInputHandler(),
+  };
+}
+
+/**
+ * Resolves the list of characters to handle for auto-pairing based on a given configuration.
+ *
+ * @param options - Partial configuration indicating which groups to enable.
+ * If omitted or empty, all characters from all groups are returned.
+ * @returns An array of auto-pair characters to handle.
+ */
+function getEnabledAutopairChars(options: AutopairsOptions = {}): Character[] {
+  return Object.entries({ ...defaultConfig, ...options })
+    .filter(([, enabled]) => !!enabled)
+    .map(([group]) => AUTOPAIR_GROUPS[group as never])
+    .flat();
 }
 
 /**
@@ -82,35 +112,27 @@ export class AutopairsPlugin extends Plugin {
  * @param {unknown} char The typed character to handle. Must be an auto-pair character.
  * @returns A ProseMirror command function.
  */
-export function createAutopairCommandForChar(char: unknown): Command {
+function createAutopairInputHandler(char: unknown): Command {
   return (state, dispatch) => {
     // Ensure the typed character is recognized as auto-closable.
-    if (!isAutopairChar(char)) {
-      return false;
-    }
+    if (!isMatchingCharacter(char)) return false;
 
     const { selection, schema } = state;
     const { from, to } = selection;
 
+    const isOpeningChar = isOpeningCharacter(char);
+    const isClosingChar = isClosingCharacter(char);
+    const closingChar = getClosingCharacter(char as never);
+
     // --- Wrapping selected text
     if (!selection.empty) {
-      // Only wrap if an opening character is typed.
+      // Cannot wrap with a closing character and very opening char should have a closing match.
+      if (!isOpeningChar || !isClosingChar) return false;
 
-      if (!isOpeningChar(char)) {
-        // Cannot wrap with a closing character.
-        return false;
-      }
-
-      const closingChar = findClosingMatch(char);
-      if (!closingChar) {
-        // Defensive check: every opening char should have a closing match.
-        return false;
-      }
+      const selectedText = state.doc.textBetween(from, to);
+      const wrappedText = char + selectedText + closingChar;
 
       if (dispatch) {
-        const selectedText = state.doc.textBetween(from, to);
-        const wrappedText = char + selectedText + closingChar;
-
         // Replace the selected content with the wrapped text.
         const content = schema.text(wrappedText);
         const tr = state.tr.replaceWith(from, to, content);
@@ -129,23 +151,23 @@ export function createAutopairCommandForChar(char: unknown): Command {
     // --- Skipping an existing closing character
     // Applies when the cursor is empty and the typed character is a closing character
     // that matches the character immediately after the cursor.
-    if (isClosingChar(char) && shouldSkipClosing(state, char)) {
+    if (isClosingChar && shouldSkipClosing(state, char)) {
       if (dispatch) {
         // Move the cursor one position forward, effectively "skipping" over the existing character.
         const pos = state.tr.doc.resolve(from + 1);
-        const newSelection = Selection.near(pos); // Use Selection.near for robust cursor placement
+        const newSelection = Selection.near(pos);
         const tr = state.tr.setSelection(newSelection);
         dispatch(tr);
       }
-      return true; // Command handled.
+
+      return true;
     }
 
     // --- Auto-closing an opening character
     // Applies when the cursor is empty and an opening character is typed.
     // It will insert the corresponding closing character immediately after.
-    if (isOpeningChar(char) && shouldAutoClose(state, char)) {
+    if (isOpeningChar && shouldAutoClose(state, char)) {
       // Construct the text to be inserted: e.g., "(" + ")" => "()"
-      const closingChar = findClosingMatch(char);
       const insertText = char + closingChar;
 
       if (dispatch) {
@@ -174,14 +196,12 @@ export function createAutopairCommandForChar(char: unknown): Command {
  * @internal
  * @returns A ProseMirror command function.
  */
-export function createBackspaceInputCommand(): Command {
+function createBackspaceInputHandler(): Command {
   return (state, dispatch) => {
     const { selection } = state;
 
     // Only act if the selection is empty (i.e., a cursor, not a range selection).
-    if (!selection.empty) {
-      return false;
-    }
+    if (!selection.empty) return false;
 
     // $cursor is a ResolvedPos object at the current cursor position.
     const { $from: $cursor } = selection;
@@ -191,9 +211,7 @@ export function createBackspaceInputCommand(): Command {
     const afterNode = $cursor.nodeAfter;
 
     // Ensure both are valid TextNodes to extract characters.
-    if (!isTextNode(beforeNode) || !isTextNode(afterNode)) {
-      return false;
-    }
+    if (!isTextNode(beforeNode) || !isTextNode(afterNode)) return false;
 
     // Extract the character immediately before and after the cursor.
     const charBefore = beforeNode.text[beforeNode.text.length - 1];

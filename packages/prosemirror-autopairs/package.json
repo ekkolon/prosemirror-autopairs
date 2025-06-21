@@ -1,0 +1,48 @@
+{
+  "name": "prosemirror-autopairs",
+  "version": "0.1.0",
+  "description": "ProseMirror plugin for smart auto-pairing of brackets and quotes",
+  "license": "MIT",
+  "author": {
+    "name": "Nelson Dominguez",
+    "email": "ekkolon@proton.me"
+  },
+  "maintainers": [
+    {
+      "name": "Nelson Dominguez",
+      "email": "ekkolon@proton.me"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekkolon/prosemirror-autopairs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ekkolon/prosemirror-autopairs/issues"
+  },
+  "type": "module",
+  "exports": {
+    "import": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "require": {
+      "types": "./index.d.ts",
+      "default": "./index.cjs"
+    }
+  },
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.cjs",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-state": "^1.4.3"
+  },
+  "packageManager": "pnpm@10.12.1"
+}

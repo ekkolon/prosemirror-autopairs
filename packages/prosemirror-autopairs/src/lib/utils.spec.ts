@@ -1,4 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import {
   isAdjacentToWordChar,
   isTextNode,
@@ -7,14 +8,13 @@ import {
   shouldSkipClosing,
 } from './utils';
 
-vi.mock('./chars', () => ({
-  isQuoteChar: vi.fn((char: string) => ['"', "'", '`'].includes(char)),
+vi.mock('./pairs', () => ({
+  isQuote: vi.fn((char: string) => ['"', "'", '`'].includes(char)),
 }));
-
-import { isQuoteChar } from './chars';
 
 import { Schema } from 'prosemirror-model';
 import { EditorState, TextSelection } from 'prosemirror-state';
+import { isQuote } from './pairs';
 
 const testSchema = new Schema({
   nodes: {
@@ -45,8 +45,7 @@ function createEditorState(
   const doc = testSchema.nodes.doc.create(null, paragraph);
 
   const start = explicitStart ?? cursorPos;
-  const end =
-    explicitEnd ?? (selectionEnd > cursorPos ? selectionEnd - 1 : start);
+  const end = explicitEnd ?? (selectionEnd > cursorPos ? selectionEnd - 1 : start);
 
   if (start < 0 || end < 0)
     throw new Error('Cursor position not provided or malformed input string.');
@@ -71,7 +70,7 @@ describe('Autopairs Utilities', () => {
     });
 
     it('should return false for a non-TextNode', () => {
-      const node = schema.nodes.doc.create(null, schema.text('hello'));
+      const node = schema.nodes['doc'].create(null, schema.text('hello'));
       expect(isTextNode(node)).toBe(false);
     });
 
@@ -154,7 +153,7 @@ describe('Autopairs Utilities', () => {
   describe('shouldAutoClose', () => {
     beforeEach(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (isQuoteChar as any).mockClear();
+      (isQuote as any).mockClear();
     });
 
     it('should return true if selection is not empty (wrapping text)', () => {
@@ -173,7 +172,7 @@ describe('Autopairs Utilities', () => {
     describe('when openChar is a quote', () => {
       beforeEach(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (isQuoteChar as any).mockReturnValue(true);
+        (isQuote as any).mockReturnValue(true);
       });
 
       it('should return false if adjacent to word character (before)', () => {

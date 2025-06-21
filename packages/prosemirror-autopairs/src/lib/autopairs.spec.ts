@@ -7,11 +7,10 @@ import { describe, expect, it } from 'vitest';
 import { autopairs } from './autopairs';
 
 const createEditor = (doc: string, cursorPos?: number) => {
-  const dom = new JSDOM(`<div id="editor">${doc.replace('|', '')}</div>`)
-    .window;
+  const dom = new JSDOM(`<div id="editor">${doc.replace('|', '')}</div>`).window;
   const contentEl = dom.document.getElementById('editor');
 
-  const parsedDoc = DOMParser.fromSchema(basicSchema).parse(contentEl);
+  const parsedDoc = DOMParser.fromSchema(basicSchema).parse(contentEl as never);
 
   // Determine cursor position
   let position: number;
@@ -22,7 +21,9 @@ const createEditor = (doc: string, cursorPos?: number) => {
     const beforeCursor = doc.substring(0, doc.indexOf('|'));
     // Remove HTML tags to get text position
     const textBeforeCursor = beforeCursor.replace(/<[^>]*>/g, '');
-    position = textBeforeCursor.length + 1; // +1 for ProseMirror's 1-based positioning inside paragraph
+
+    // +1 for ProseMirror's 1-based positioning inside paragraph
+    position = textBeforeCursor.length + 1;
   } else {
     position = 1; // Default to start of first paragraph
   }
@@ -44,15 +45,14 @@ const createEditor = (doc: string, cursorPos?: number) => {
 };
 
 describe('AutopairsPlugin', () => {
-  it('inserts closing pair when typing opening char', () => {
+  it('should insert closing pair when typing opening char', () => {
     const { view } = createEditor('<p></p>', 1);
 
-    // The autopairs plugin should transform a simple insertion of '('
+    // The plugin should transform a simple insertion of '('
     // into an insertion of '()' with cursor positioned between them
     const initialState = view.state;
     const tr = initialState.tr.insertText('(');
 
-    // Apply the transaction - the plugin should modify it
     view.dispatch(tr);
 
     // Check if the plugin worked correctly
@@ -66,14 +66,13 @@ describe('AutopairsPlugin', () => {
     } else {
       // If the plugin doesn't auto-insert, just verify the basic insertion worked
       expect(finalText).toBe('(');
-      // console.warn('Autopairs plugin may not be auto-inserting closing pairs');
     }
   });
 
   it('wraps selected text when opening char is typed', () => {
     const { view } = createEditor('<p>wrap me</p>');
 
-    // First, select all the text "wrap me"
+    // Select all the text "wrap me"
     const textLength = view.state.doc.textContent.length;
     const selection = TextSelection.create(view.state.doc, 1, textLength + 1);
     view.dispatch(view.state.tr.setSelection(selection));
@@ -85,7 +84,7 @@ describe('AutopairsPlugin', () => {
     );
     expect(selectedText).toBe('wrap me');
 
-    // Now insert '(' - should wrap the selected text
+    // Inserting '(' should wrap the selected text
     view.dispatch(view.state.tr.insertText('('));
 
     const finalText = view.state.doc.textContent;
@@ -96,24 +95,21 @@ describe('AutopairsPlugin', () => {
     } else {
       // If wrapping doesn't work, it should at least replace the selection with '('
       expect(finalText).toBe('(');
-      // console.warn('Autopairs plugin may not be wrapping selected text');
     }
   });
 
   it('skips closing char when typed at cursor before match', () => {
     const { view } = createEditor('<p>(|)</p>');
     view.dispatch(view.state.tr.insertText(')'));
-    expect(view.state.selection.from).toBe(3); // Cursor moved past closing parenthesis
+    // Cursor moved past closing parenthesis
+    expect(view.state.selection.from).toBe(3);
   });
 
   it('deletes both matching chars on backspace between pair', () => {
     const { view } = createEditor('<p>(|)</p>');
     // Delete the opening and closing parentheses
     view.dispatch(
-      view.state.tr.delete(
-        view.state.selection.from - 1, // Delete opening paren
-        view.state.selection.from + 1, // Delete closing paren
-      ),
+      view.state.tr.delete(view.state.selection.from - 1, view.state.selection.from + 1),
     );
     expect(view.state.doc.textContent).toBe('');
   });
