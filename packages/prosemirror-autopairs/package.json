@@ -1,6 +1,6 @@
 {
   "name": "prosemirror-autopairs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ProseMirror plugin for smart auto-pairing of brackets and quotes",
   "license": "MIT",
   "author": {
